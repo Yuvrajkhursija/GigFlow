@@ -24,11 +24,17 @@ const io = new Server(httpServer, {
     credentials: true,
   },
 });
-
-// Middleware
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "http://localhost:5173"
+];
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
-  credentials: true,
+  origin: function (origin, cb) {
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error("Not allowed by CORS"));
+  },
+  credentials: true
 }));
 app.use(express.json());
 app.use(cookieParser());
